@@ -17,20 +17,6 @@ import { MenuModule } from './menu/menu.module';
       isGlobal: true,
       load: configuration,
     }),
-    // MongooseModule.forRootAsync({
-    //   imports: [ConfigModule],
-    //   useFactory: (configService: ConfigService) => {
-        // if(process.env["LOCAL"] === "true") {
-        //   return {
-        //     uri: "mongodb://localhost:27017/freshgo"
-        //   }
-        // }
-        // return { 
-        //   uri: configService.get("DATABASE.url") 
-        // };
-    //   },
-    //   inject: [ConfigService],
-    // }),
     AuthModule,
     AdminModule,
     DatabaseModule,
