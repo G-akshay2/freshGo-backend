@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
@@ -7,6 +7,7 @@ import { AdminModule } from './admin/admin.module';
 import configuration from "./config/configuration"
 import { DatabaseModule } from './infra/mongoose/database.module';
 import { MenuModule } from './menu/menu.module';
+import { v2 } from 'cloudinary';
 
 @Module({
   imports: [
