@@ -1,7 +1,6 @@
-import { Prop, raw, Schema } from "@nestjs/mongoose";
-import { Types } from "mongoose";
+import { Prop, raw, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { Document } from "mongoose";
 import { GROCERICES_TYPE } from "src/infra/constants/app.constants";
-import { Address, AddressSchema } from "./address.schema";
 
 @Schema({
   timestamps: true,
@@ -17,7 +16,7 @@ export class Menu {
     type: String,
     required: true,
     select: false,
-    enum: Object.values(GROCERICES_TYPE) ,
+    enum: Object.values(GROCERICES_TYPE),
     immutable: true,
     default: GROCERICES_TYPE.FRUIT,
   })
@@ -26,26 +25,10 @@ export class Menu {
   @Prop({ required: true })
   color: string;
 
-  @Prop({ type: AddressSchema })
-  address: Address;
-
   @Prop(raw({}))
-  metadata: any;
-
-  @Prop({type: Types.ObjectId, required: true, ref: "Menu"})
-  menuList: Array<string | Types.ObjectId>
+  metadata: any | Record<string, any>;
 }
 
-
-
-
-// User
-// Email, Password, UserName, Address, CartItems, type
-// Farmers
-// Email, Password, UserName, Address, type, MenuItems,
-// Distributors
-// Email, Password, UserName, Address, type, MenuItems, CartItems
-// Vendor
-// Email, Password, UserName, Address, type, MenuItems, CartItems, Locations,
-// Admin
-// Username, Password, Type
+export type MenuDocument = Menu & Document;
+export const MENU_NAME = Menu.name;
+export const MenuSchema = SchemaFactory.createForClass(Menu);

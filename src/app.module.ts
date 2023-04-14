@@ -7,7 +7,9 @@ import { AdminModule } from './admin/admin.module';
 import configuration from "./config/configuration"
 import { DatabaseModule } from './infra/mongoose/database.module';
 import { MenuModule } from './menu/menu.module';
-import { v2 } from 'cloudinary';
+import { CustomersModule } from './customers/customers.module';
+import { MongooseModelsModule } from './infra/mongoose/mongoose-model.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -22,6 +24,9 @@ import { v2 } from 'cloudinary';
     AdminModule,
     DatabaseModule,
     MenuModule,
+    CustomersModule,
+    MongooseModelsModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],
