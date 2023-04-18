@@ -6,10 +6,10 @@ export class Address {
   houseNumber: string;
 
   @Prop({ required: true })
-  state: boolean;
+  state: string;
 
   @Prop({ required: true })
-  city: boolean;
+  city: string;
 
   @Prop({ required: true })
   zipCode: string;

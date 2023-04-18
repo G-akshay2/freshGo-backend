@@ -7,18 +7,74 @@ import { User } from "./user.schema";
   timestamps: true,
 })
 export class Vendor extends User {
-  @Prop({type: Types.ObjectId, required: true, ref: Menu.name})
-  menuList: Array<string | Types.ObjectId>
+  @Prop([{
+    name: { type: Types.ObjectId, ref: Menu.name },
+    quantity: { type: Number, required: true }
+  }])
+  menuList: Array<{
+    name: string | Types.ObjectId,
+    quantity: number,
+  }>
 
   @Prop({
     type: [{
-      vendor: { type: Types.ObjectId, required: true, ref: User.name },
-      groceries: [ { type: Types.ObjectId, ref: Menu.name } ],
+      seller: { type: Types.ObjectId, required: true, ref: User.name },
+      items: [{
+        groceries: { type: Types.ObjectId, ref: Menu.name, required: true } ,
+        quantity: { type: Number, required: true }
+      }]
     }],
   })
-  cartItems: Array<{vendor: Types.ObjectId, groceries: Array<Types.ObjectId | String>}>;
+  cartItems: Array<{vendor: Types.ObjectId, items : Array<{ groceries: Types.ObjectId | String, quantity: number }> }>;
+
+  @Prop({ type: Boolean })
+  payOnDelivery?: boolean;
+  
+  @Prop([
+    {
+      status: { type: String },
+      customer: { type: Types.ObjectId, required: true, ref: User.name },
+      items: [{
+        groceries: { type: Types.ObjectId, ref: Menu.name },
+        quantity: { type: Number }
+      }]
+    }
+  ])
+  orders: Array<{
+    status: string,
+    customer: Types.ObjectId,
+    items: Array<{ groceries: Types.ObjectId | String, quantity: number }>,
+  }>;
+
+  @Prop([{
+    status: { type: String },
+    seller: { type: Types.ObjectId, required: true, ref: User.name },
+    items: [{
+      groceries: { type: Types.ObjectId, ref: Menu.name },
+      quantity: { type: Number }
+    }]
+  }])
+  ordersPlaced: {
+    status: string,
+    seller: Types.ObjectId,
+    items: Array<{ groceries: Types.ObjectId | String, quantity: number }>,
+  };
+
+  @Prop({
+    type: { type: String, default: "Point" },
+    coordinates: {
+      type: [Number],
+    }
+  })
+  location?: {
+    type: string,
+    coordinates: Array<number>,
+  };
+
+  @Prop({ default: false })
+  isOnlinePaymentAvailable: boolean;
 }
 
-export type DistributorDocument = Vendor & Document;
+export type VendorDocument = Vendor & Document;
 export const VENDOR_NAME = Vendor.name;
 export const VendorSchema = SchemaFactory.createForClass(Vendor);

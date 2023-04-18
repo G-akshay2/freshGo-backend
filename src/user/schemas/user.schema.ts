@@ -1,8 +1,9 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Document } from "mongoose";
+import { Document, Types } from "mongoose";
 import { USER_TYPE } from "src/infra/constants/app.constants";
 import { Address, AddressSchema } from "./address.schema";
 import { compare, hash } from "bcrypt";
+import { Menu } from "src/menu/schema/menu.schema";
 
 @Schema({
   timestamps: true,
@@ -13,13 +14,13 @@ import { compare, hash } from "bcrypt";
       return isMatched;
     },
   },
-  discriminatorKey: "userKey"
+  discriminatorKey: "userType"
 })
 export class User {
-  @Prop({ type: String, required: true })
-  username: string;
+  @Prop({ type: String, unique: true })
+  userName: string;
 
-  @Prop({ required: true })
+  @Prop({ required: true, unique: true })
   email: string;
 
   @Prop({ required: true, select: false })
@@ -28,8 +29,11 @@ export class User {
   @Prop()
   imageUrl: string;
 
-  @Prop({ type: AddressSchema })
-  address: Address;
+  @Prop({ required: true, unique: true })
+  phoneNumber: number;
+
+  @Prop({ type: [AddressSchema] })
+  address: Array<Address>;
 
   @Prop({
     type: String,
@@ -39,18 +43,18 @@ export class User {
   })
   type: USER_TYPE;
 
-  passwordValidation: (password: string) => Promise<boolean>
+  passwordValidation: (password: string) => Promise<boolean>;
 }
 
 export type UserDocument = User & Document;
 export const USER_NAME = User.name;
 export const UserSchema = SchemaFactory.createForClass(User);
 
-UserSchema.pre("save", async function(next: Function) {
-  const hashedPassowrd = await hash(this.password, 10);
-  this.password = hashedPassowrd;
-  next();
-})
+// UserSchema.pre("save", async function(next: Function) {
+//   const hashedPassowrd = await hash(this.password, 10);
+//   this.password = hashedPassowrd;
+//   next();
+// })
 
 //Instance Methods
 
@@ -70,10 +74,10 @@ UserSchema.methods.isValidate = async function(password: string) {
 
 // Hooks
 // Populates menuList if we call findOne function
-UserSchema.pre("findOne", function(next: Function) {
-  this.populate("menuList");
-  next();
-})
+// UserSchema.pre("findOne", function(next: Function) {
+//   this.populate("menuList");
+//   next();
+// })
 
 // User
 // Email, Password, UserName, Address, CartItems, type
