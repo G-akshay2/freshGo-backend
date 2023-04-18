@@ -1,0 +1,38 @@
+import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { Document, Types } from "mongoose";
+import { Menu } from "src/menu/schema/menu.schema";
+import { User } from "./user.schema";
+
+@Schema({
+  timestamps: true,
+})
+export class Customer extends User {
+  @Prop({
+    type: [{
+      seller: { type: Types.ObjectId, required: true, ref: User.name },
+      items: [{
+        groceries: { type: Types.ObjectId, ref: Menu.name } ,
+        quantity: { type: Number }
+      }]
+    }],
+  })
+  cartItems: Array<{vendor: Types.ObjectId, items : Array<{ groceries: Types.ObjectId | String, quantity: number }> }>;
+
+  @Prop([{
+    status: { type: String },
+    seller: { type: Types.ObjectId, required: true, ref: User.name },
+    items: [{
+      groceries: { type: Types.ObjectId, ref: Menu.name },
+      quantity: { type: Number }
+    }]
+  }])
+  ordersPlaced: {
+    status: string,
+    seller: Types.ObjectId,
+    items: Array<{ groceries: Types.ObjectId | String, quantity: number }>,
+  };
+}
+
+export type CustomerDocument = Customer & Document;
+export const CUSTOMER_NAME = Customer.name;
+export const CustomerSchema = SchemaFactory.createForClass(Customer);
