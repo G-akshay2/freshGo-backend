@@ -6,6 +6,7 @@ import { DISTRIBUTOR_NAME, DistributorSchema } from "src/user/schemas/distibutor
 import { FARMER_NAME, FarmerSchema } from "src/user/schemas/farmer.schema";
 import { USER_NAME, UserSchema } from "src/user/schemas/user.schema";
 import { VENDOR_NAME, VendorSchema } from "src/user/schemas/vendor.schema";
+import { WAREHOUSE_NAME, WareHouseSchema } from "src/warehouses/schema/warehouse.schema";
 
 const MODELS = [
   { name: MENU_NAME, schema: MenuSchema },
@@ -15,6 +16,7 @@ const MODELS = [
     { name: VENDOR_NAME, schema: VendorSchema },
     { name: CUSTOMER_NAME, schema: CustomerSchema },
   ] },
+  { name: WAREHOUSE_NAME, schema: WareHouseSchema },
 ];
 
 @Global()

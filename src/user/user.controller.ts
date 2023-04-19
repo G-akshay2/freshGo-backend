@@ -23,6 +23,24 @@ export class UserController {
       throw new HttpException(error, error.status);
     }
   }
+
+  @Get('farmers')
+  async farmers() {
+    try {
+      return await this.userService.farmers();
+    } catch (error) {
+      throw new HttpException(error, error.status);
+    }
+  }
+
+  @Get('distributors')
+  async distributors() {
+    try {
+      return await this.userService.distributors();
+    } catch (error) {
+      throw new HttpException(error, error.status);
+    }
+  }
   
   @Post('addToCart')
   async addToCart(@Query('id') id: string, @Body() cart: AddToCart) {

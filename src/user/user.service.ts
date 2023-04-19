@@ -82,6 +82,22 @@ export class UserService {
     }
   }
 
+  async farmers() {
+    try {
+      return await this.farmerModel.find(); 
+    } catch (error) {
+      throw new HttpException(error, error.status);
+    }
+  }
+
+  async distributors() {
+    try {
+      return await this.distributorModel.find(); 
+    } catch (error) {
+      throw new HttpException(error, error.status);
+    }
+  }
+
   async addToCart(cartItem: AddToCart, id: string) {
     try {
       const user = await this.customerModel.findById(id);

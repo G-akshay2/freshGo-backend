@@ -10,6 +10,7 @@ import { MenuModule } from './menu/menu.module';
 import { CustomersModule } from './customers/customers.module';
 import { MongooseModelsModule } from './infra/mongoose/mongoose-model.module';
 import { UserModule } from './user/user.module';
+import { WarehousesModule } from './warehouses/warehouses.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { UserModule } from './user/user.module';
     CustomersModule,
     MongooseModelsModule,
     UserModule,
+    WarehousesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
