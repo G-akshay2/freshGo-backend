@@ -33,10 +33,11 @@ export class WarehousesService {
   }
   async getStatesOfWarehouses() {
     try {
+
       return await this.wareHouseModel.aggregate([
         {
           $group: {
-            _id: "$states",
+            _id: "$state",
           }
         },
       ]);
@@ -47,7 +48,8 @@ export class WarehousesService {
 
   async getLocationByState(state: string) {
     try {
-      return await this.wareHouseModel.find({ state });
+      const data = await this.wareHouseModel.find({ state });
+      return data;
     } catch (error) {
       throw new HttpException(error, error.status);
     }
