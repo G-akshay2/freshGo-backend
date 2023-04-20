@@ -32,7 +32,7 @@ export class MenuController {
   @UseInterceptors(FileInterceptor('file'))
   async uploadItem(@UploadedFile( new ParseFilePipe({
       validators: [
-        new MaxFileSizeValidator({ maxSize: 1000000 }), // Maximum Size of file can be 1MB
+        new MaxFileSizeValidator({ maxSize: 10000000 }), // Maximum Size of file can be 10MB
       ]
     }) ) file: Express.Multer.File, @Req() req: Request) {
     try {
