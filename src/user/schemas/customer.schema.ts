@@ -12,11 +12,12 @@ export class Customer extends User {
       seller: { type: Types.ObjectId, required: true, ref: User.name },
       items: [{
         groceries: { type: Types.ObjectId, ref: Menu.name } ,
-        quantity: { type: Number }
+        quantity: { type: Number },
+        price: { type: Number }
       }]
     }],
   })
-  cartItems: Array<{seller: Types.ObjectId, items : Array<{ groceries: Types.ObjectId | String, quantity: number }> }>;
+  cartItems: Array<{seller: Types.ObjectId, items : Array<{ groceries: Types.ObjectId | String, quantity: number, price: number }> }>;
 
   @Prop([{
     status: { type: String },

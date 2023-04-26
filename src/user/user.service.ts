@@ -165,6 +165,40 @@ export class UserService {
     }
   }
 
+  async findUserCartItems(id: string, userType: string) {
+    try {
+      let user: DistributorDocument | VendorDocument | CustomerDocument;
+      switch (userType) {
+        case "Vendor": {
+          user = await this.vendorModel.findById(id);
+          break;
+        }
+        case "Distributor": {
+          user = await this.distributorModel.findById(id);
+          break;
+        }
+        case "Customer": {
+          console.log(userType);
+          user = await this.customerModel.findById(id, 'cartItems').populate(['cartItems.seller', 'cartItems.items.groceries']);
+          break;
+        }
+      }
+      return user;
+    } catch (error) {
+      console.log(error)
+      throw new HttpException(error, error.status);
+    }
+  }
+
+
+  async userCartItems(id: string, userType: string) {
+    try {
+      return await this.findUserCartItems(id, userType);
+    } catch (error) {
+      throw new HttpException(error, error.status);
+    }
+  }
+
   async addToCart(cartItem: AddToCart, id: string) {
     try {
       const user = await this.customerModel.findById(id);
@@ -173,7 +207,8 @@ export class UserService {
         if (user.cartItems[i].seller.toString() === cartItem.seller.toString()) {
           for (let j = 0; j < user.cartItems[i].items.length; j++) {
             if (user.cartItems[i].items[j].groceries.toString() === cartItem.item.groceries.toString()) {
-              user.cartItems[i].items[j].quantity++;
+              user.cartItems[i].items[j].quantity = cartItem.item.quantity;
+              user.cartItems[i].items[j].price = cartItem.item.price;
               flag = 0;
               break;
             }
@@ -192,10 +227,10 @@ export class UserService {
           items: [cartItem.item]
         });
       }
-      await user.save();
+      const userCart = await (await user.save()).populate(['cartItems.seller', 'cartItems.items.groceries']);
       return {
         message: "Added to Cart",
-        success: true,
+        success: true, data: userCart.cartItems
       }
     } catch (error) {
       throw new HttpException(error, error.status);

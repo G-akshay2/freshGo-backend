@@ -62,6 +62,15 @@ export class UserController {
     }
   }
 
+  @Get('get/cart/items')
+  async getCartItems(@Query('id') id: string, @Query('userType') userType: string,) {
+    try {
+      return await this.userService.userCartItems(id, userType);
+    } catch (error) {
+      throw new HttpException(error, error.status);
+    }
+  }
+
   @Post('addToCart')
   async addToCart(@Query('id') id: string, @Body() cart: AddToCart) {
     try {

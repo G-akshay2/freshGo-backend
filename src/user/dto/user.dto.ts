@@ -81,7 +81,8 @@ export class AddToCart {
   @IsNotEmpty()
   item: {
     groceries: Types.ObjectId | String,
-    quantity: number
+    quantity: number,
+    price: number
   };
 }
 
