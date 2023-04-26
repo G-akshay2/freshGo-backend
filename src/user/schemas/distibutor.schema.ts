@@ -9,23 +9,25 @@ import { User } from "./user.schema";
 export class Distributor extends User {
   @Prop([{
     name: { type: Types.ObjectId, ref: Menu.name },
-    quantity: { type: Number, required: true }
+    quantity: { type: Number, required: true },
+    price: { type: Number, required: true }
   }])
   menuList: Array<{
     name: string | Types.ObjectId,
     quantity: number,
+    price: number
   }>
 
   @Prop({
     type: [{
-      vendor: { type: Types.ObjectId, required: true, ref: User.name },
+      seller: { type: Types.ObjectId, required: true, ref: User.name },
       items: [{
         groceries: { type: Types.ObjectId, ref: Menu.name, required: true },
         quantity: { type: Number, required: true }
       }]
     }],
   })
-  cartItems: Array<{ vendor: Types.ObjectId, items: Array<{ groceries: Types.ObjectId | String, quantity: number }> }>;
+  cartItems: Array<{ seller: Types.ObjectId, items: Array<{ groceries: Types.ObjectId | String, quantity: number }> }>;
 
   @Prop({ type: Boolean })
   payOnDelivery?: boolean;

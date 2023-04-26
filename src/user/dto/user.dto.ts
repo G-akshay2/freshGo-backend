@@ -77,7 +77,7 @@ export class Pagination {
 
 export class AddToCart {
   @IsNotEmpty()
-  vendor: Types.ObjectId;
+  seller: Types.ObjectId;
   @IsNotEmpty()
   item: {
     groceries: Types.ObjectId | String,

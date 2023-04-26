@@ -101,7 +101,16 @@ export class UserService {
             distanceMultiplier: 0.000621371,
           },
         },
+        {
+          $lookup: {
+            from: "menus",
+            localField: "menuList.name",
+            foreignField: "_id",
+            as: "list"
+          }
+        }
       ]);
+      console.log(data);
       return { success: true, data } ;
     } catch (error) {
       throw new HttpException(error.response, error.status);
@@ -124,12 +133,43 @@ export class UserService {
     }
   }
 
+  async getMenuItemsOfSeller(id: string, userType: string) {
+    try {
+      let user: FarmerDocument | DistributorDocument | VendorDocument;
+      switch (userType) {
+        case "Vendor": {
+          user = await this.vendorModel.findById(id);
+          break;
+        }
+        case "Distributor": {
+          user = await this.distributorModel.findById(id);
+          break;
+        }
+        case "Farmer": {
+          user = await this.farmerModel.findById(id);
+          break;
+        }
+      }
+      return user.menuList;
+    } catch (error) {
+      throw new HttpException(error, error.status);
+    }
+  }
+
+  async getMenuItems(id: string, userType: string) {
+    try {
+      return await this.getMenuItemsOfSeller(id, userType);
+    } catch (error) {
+      throw new HttpException(error, error.status);
+    }
+  }
+
   async addToCart(cartItem: AddToCart, id: string) {
     try {
       const user = await this.customerModel.findById(id);
       let flag = 1;
       for (let i = 0; i < user?.cartItems?.length; i++) {
-        if (user.cartItems[i].vendor.toString() === cartItem.vendor.toString()) {
+        if (user.cartItems[i].seller.toString() === cartItem.seller.toString()) {
           for (let j = 0; j < user.cartItems[i].items.length; j++) {
             if (user.cartItems[i].items[j].groceries.toString() === cartItem.item.groceries.toString()) {
               user.cartItems[i].items[j].quantity++;
@@ -147,7 +187,7 @@ export class UserService {
       }
       if (flag === 1) {
         user.cartItems.push({
-          vendor: cartItem.vendor,
+          seller: cartItem.seller,
           items: [cartItem.item]
         });
       }
@@ -180,6 +220,7 @@ export class UserService {
         items: data.items,
       });
       await user.save();
+      console.log(user)
     } catch (error) {
       throw new HttpException(error, error.status);
     }

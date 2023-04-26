@@ -27,7 +27,7 @@ export class Vendor extends User {
       }]
     }],
   })
-  cartItems: Array<{vendor: Types.ObjectId, items : Array<{ groceries: Types.ObjectId | String, quantity: number }> }>;
+  cartItems: Array<{seller: Types.ObjectId, items : Array<{ groceries: Types.ObjectId | String, quantity: number }> }>;
 
   @Prop({ type: Boolean })
   preOrder?: boolean;

@@ -9,11 +9,13 @@ import { User } from "./user.schema";
 export class Farmer extends User {
   @Prop([{
     name: { type: Types.ObjectId, ref: Menu.name },
-    quantity: { type: Number, required: true }
+    quantity: { type: Number, required: true },
+    price: { type: Number, required: true }
   }])
   menuList: Array<{
     name: string | Types.ObjectId,
     quantity: number,
+    price: number
   }>
 
   @Prop({ type: Boolean })

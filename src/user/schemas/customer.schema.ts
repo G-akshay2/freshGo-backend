@@ -16,7 +16,7 @@ export class Customer extends User {
       }]
     }],
   })
-  cartItems: Array<{vendor: Types.ObjectId, items : Array<{ groceries: Types.ObjectId | String, quantity: number }> }>;
+  cartItems: Array<{seller: Types.ObjectId, items : Array<{ groceries: Types.ObjectId | String, quantity: number }> }>;
 
   @Prop([{
     status: { type: String },
