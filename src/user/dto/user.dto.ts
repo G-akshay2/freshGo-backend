@@ -93,4 +93,11 @@ export class BuyItemsDTO {
 export class MenuDTO {
   name: string | Types.ObjectId;
   quantity: number;
+  price: number;
+}
+
+export class GoeData {
+  lat: number;
+  long: number;
+  dist: number
 }

@@ -2,7 +2,7 @@ import { BadRequestException, HttpException, Injectable, NotFoundException } fro
 import { USER_NAME, UserDocument } from './schemas/user.schema';
 import mongoose, { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { AddToCart, BuyItemsDTO, LoginDTO, MenuDTO, RegisterDTO } from './dto/user.dto';
+import { AddToCart, BuyItemsDTO, GoeData, LoginDTO, MenuDTO, RegisterDTO } from './dto/user.dto';
 import { CUSTOMER_NAME, CustomerDocument } from './schemas/customer.schema';
 import { hash } from 'bcrypt';
 import { DISTRIBUTOR_NAME, DistributorDocument } from './schemas/distibutor.schema';
@@ -63,6 +63,7 @@ export class UserService {
 
   async loginUser(userDetails: LoginDTO) {
     try {
+      console.log(userDetails);
       const user = await this.userModel.findOne({ email: userDetails.email }, "+password");
       if (!user) {
         throw new NotFoundException("User Not Found");
@@ -77,6 +78,31 @@ export class UserService {
         message: "Successfully Logged In",
         success: true, user
       }
+    } catch (error) {
+      throw new HttpException(error.response, error.status);
+    }
+  }
+
+  async getCoordinatesOfvendors(geoData: GoeData) {
+    try {
+      console.log(geoData);
+      const distnace = Number(geoData.dist) * 1609;
+      console.log(distnace);
+      const data = await this.vendorModel.aggregate([
+        {
+          $geoNear: {
+            near: {
+              type: 'Point',
+              coordinates: [geoData.long, geoData.lat],
+            },
+            distanceField: 'distance',
+            maxDistance: distnace,
+            spherical: true,
+            distanceMultiplier: 0.000621371,
+          },
+        },
+      ]);
+      return { success: true, data } ;
     } catch (error) {
       throw new HttpException(error.response, error.status);
     }

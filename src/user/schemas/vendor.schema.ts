@@ -9,11 +9,13 @@ import { User } from "./user.schema";
 export class Vendor extends User {
   @Prop([{
     name: { type: Types.ObjectId, ref: Menu.name },
-    quantity: { type: Number, required: true }
+    quantity: { type: Number, required: true },
+    price: { type: Number, required: true }
   }])
   menuList: Array<{
     name: string | Types.ObjectId,
     quantity: number,
+    price: number
   }>
 
   @Prop({
@@ -28,7 +30,10 @@ export class Vendor extends User {
   cartItems: Array<{vendor: Types.ObjectId, items : Array<{ groceries: Types.ObjectId | String, quantity: number }> }>;
 
   @Prop({ type: Boolean })
-  payOnDelivery?: boolean;
+  preOrder?: boolean;
+
+  @Prop({ type: String })
+  storeName?: string;
   
   @Prop([
     {
@@ -73,6 +78,9 @@ export class Vendor extends User {
 
   @Prop({ default: false })
   isOnlinePaymentAvailable: boolean;
+
+  @Prop({ default: false })
+  doorDelivery: boolean;
 }
 
 export type VendorDocument = Vendor & Document;

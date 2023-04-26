@@ -15,3 +15,9 @@ export class WareHouseDTO {
   @IsNotEmpty()
   town: string;
 }
+
+export class Payment {
+  token: string;
+  name: string;
+  amount: number;
+}

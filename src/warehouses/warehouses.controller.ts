@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Query, HttpException } from '@nestjs/common';
 import { WarehousesService } from './warehouses.service';
-import { WareHouseDTO } from './dto/warehouse.dto';
+import { Payment, WareHouseDTO } from './dto/warehouse.dto';
 
 @Controller('warehouse')
 export class WarehousesController {
@@ -18,10 +18,15 @@ export class WarehousesController {
   @Post()
   async addLocation(@Body() location: WareHouseDTO) {
     try {
-      return await this.warehousesService.addLocation(location);
+      return await this.warehousesService.getMapLocations();;
     } catch (error) {
       throw new HttpException(error, error.status);
     }
+  }
+
+  @Post('pay')
+  async pay(@Body() body: any) {
+    return await this.warehousesService.pay(body);
   }
 
   @Get('state/locations')

@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, HttpException, Query } from '@nestjs/common';
 import { UserService } from './user.service';
-import { LoginDTO, RegisterDTO, AddToCart, BuyItemsDTO, MenuDTO } from './dto/user.dto';
+import { LoginDTO, RegisterDTO, AddToCart, BuyItemsDTO, MenuDTO, GoeData } from './dto/user.dto';
 
 @Controller('user')
 export class UserController {
@@ -18,9 +18,20 @@ export class UserController {
   @Post('login')
   async login(@Body() userDetails: LoginDTO) {
     try {
+      console.log(userDetails);
       return await this.userService.loginUser(userDetails);
     } catch (error) {
       throw new HttpException(error, error.status);
+    }
+  }
+
+  @Post('get/coordinates')
+  async getCoordinatesOfvendors(@Body() body: any) {
+    try {
+      console.log(body);
+      return await this.userService.getCoordinatesOfvendors(body);
+    } catch (error) {
+      throw new HttpException(error.response, error.status);
     }
   }
 

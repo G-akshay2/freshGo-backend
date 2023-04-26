@@ -27,7 +27,7 @@ export class User {
   password: string;
 
   @Prop()
-  imageUrl: string;
+  imageUrl?: string;
 
   @Prop({ required: true, unique: true })
   phoneNumber: number;
