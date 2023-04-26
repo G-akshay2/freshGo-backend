@@ -138,20 +138,21 @@ export class UserService {
       let user: FarmerDocument | DistributorDocument | VendorDocument;
       switch (userType) {
         case "Vendor": {
-          user = await this.vendorModel.findById(id);
+          user = await this.vendorModel.findById(id).populate('menuList.name');
           break;
         }
         case "Distributor": {
-          user = await this.distributorModel.findById(id);
+          user = await this.distributorModel.findById(id).populate('menuList.name');
           break;
         }
         case "Farmer": {
-          user = await this.farmerModel.findById(id);
+          user = await this.farmerModel.findById('menuList.name');
           break;
         }
       }
       return user.menuList;
     } catch (error) {
+      console.log(error)
       throw new HttpException(error, error.status);
     }
   }
