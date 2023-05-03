@@ -27,11 +27,11 @@ export class Customer extends User {
       quantity: { type: Number }
     }]
   }])
-  ordersPlaced: {
+  ordersPlaced: Array<{
     status: string,
     seller: Types.ObjectId,
     items: Array<{ groceries: Types.ObjectId | String, quantity: number }>,
-  };
+  }>;
 }
 
 export type CustomerDocument = Customer & Document;

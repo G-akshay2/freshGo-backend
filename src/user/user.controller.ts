@@ -81,9 +81,9 @@ export class UserController {
   }
 
   @Post('buy/items')
-  async buyGrocery(@Body() data: BuyItemsDTO[], @Query('buyerId') buyerId: string, @Query('sellerType') sellerType: string, @Query('orderType') orderType: string) {
+  async buyGrocery(@Body() data: BuyItemsDTO[], @Query('buyerId') buyerId: string, @Query('sellerType') sellerType: string, @Query('buyerType') buyerType: string, @Query('orderType') orderType: string) {
     try {
-      return await this.userService.buyGroceries(data, buyerId, sellerType, orderType);
+      return await this.userService.buyGroceries(data, buyerId, sellerType, buyerType, orderType);
     } catch (error) {
       throw new HttpException(error, error.status);
     }

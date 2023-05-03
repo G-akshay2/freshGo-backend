@@ -60,11 +60,11 @@ export class Vendor extends User {
       quantity: { type: Number }
     }]
   }])
-  ordersPlaced: {
+  ordersPlaced: Array<{
     status: string,
     seller: Types.ObjectId,
     items: Array<{ groceries: Types.ObjectId | String, quantity: number }>,
-  };
+  }>;
 
   @Prop({
     type: { type: String, default: "Point" },

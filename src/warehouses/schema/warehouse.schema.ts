@@ -21,6 +21,9 @@ export class WareHouse {
 
   @Prop({ required: true })
   town: string;
+
+  @Prop({ type: String })
+  name: string;
 }
 
 export type WareHouseDocument = WareHouse & Document;

@@ -119,7 +119,7 @@ export class UserService {
 
   async farmers() {
     try {
-      return await this.farmerModel.find(); 
+      return await this.farmerModel.find().populate('menuList.name'); 
     } catch (error) {
       throw new HttpException(error, error.status);
     }
@@ -127,7 +127,7 @@ export class UserService {
 
   async distributors() {
     try {
-      return await this.distributorModel.find(); 
+      return await this.distributorModel.find().populate('menuList.name'); 
     } catch (error) {
       throw new HttpException(error, error.status);
     }
@@ -146,7 +146,7 @@ export class UserService {
           break;
         }
         case "Farmer": {
-          user = await this.farmerModel.findById('menuList.name');
+          user = await this.farmerModel.findById(id).populate('menuList.name');
           break;
         }
       }
@@ -237,9 +237,9 @@ export class UserService {
     }
   }
 
-  async buyGrocery(data: BuyItemsDTO, buyerId: string, sellerType: string, orderType: string) {
+  async buyGrocery(data: BuyItemsDTO, buyerId: string, sellerType: string, buyerType: string, orderType: string) {
     try {
-      let user: DistributorDocument | VendorDocument;
+      let user: DistributorDocument | VendorDocument | FarmerDocument;
       switch (sellerType) {
         case "Vendor": {
           user = await this.vendorModel.findById(data.seller);
@@ -249,6 +249,10 @@ export class UserService {
           user = await this.distributorModel.findById(data.seller);
           break;
         }
+        case "Farmer": {
+          user = await this.farmerModel.findById(data.seller);
+          break;
+        }
       }
       user.orders.push({
         status: orderType,
@@ -256,16 +260,36 @@ export class UserService {
         items: data.items,
       });
       await user.save();
-      console.log(user)
+      let buyer: DistributorDocument | VendorDocument | CustomerDocument;
+      switch (buyerType) {
+        case "Vendor": {
+          buyer = await this.vendorModel.findById(buyerId);
+          break;
+        }
+        case "Distributor": {
+          buyer = await this.distributorModel.findById(buyerId);
+          break;
+        }
+        case "Customer": {
+          buyer = await this.customerModel.findById(buyerId);
+          break;
+        }
+      }
+      buyer.ordersPlaced.push({
+        status: orderType,
+        seller: new mongoose.Types.ObjectId(data.seller),
+        items: data.items,
+      });
+      await buyer.save();
     } catch (error) {
       throw new HttpException(error, error.status);
     }
   }
 
-  async buyGroceries(items: BuyItemsDTO[], buyerId: string, sellerType: string, orderType: string) {
+  async buyGroceries(items: BuyItemsDTO[], buyerId: string, sellerType: string, buyerType: string, orderType: string) {
     try {
       for (let i = 0; i < items.length; i++) {
-        await this.buyGrocery(items[i], buyerId, sellerType, orderType);
+        await this.buyGrocery(items[i], buyerId, sellerType, buyerType, orderType);
       }
       return {
         message: "Order Placed SuccessFully",
@@ -321,7 +345,7 @@ export class UserService {
           _id: new mongoose.Types.ObjectId(id),
         } 
       },
-      { $unwind: '$orders' }
+      { $unwind: '$orders' },
     )
     if(orderType) {
       aggregate.push(
@@ -335,13 +359,30 @@ export class UserService {
     else {
       aggregate.push({
         $group: { _id: '$orders.status', orders: { $push: '$$ROOT' } } 
-      });
-    }
-    aggregate.push({
-      $project: {
-        orders: 1
+      }, {
+        $project: { 'orders.orders': 1, 'orders.customer': 1 }
+      },
+      {
+        $lookup: {
+          from: "menus",
+          localField: "orders.orders.items.groceries",
+          foreignField: "_id",
+          as: "orderedItems"
+        }
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "orders.orders.customer",
+          foreignField: "_id",
+          as: "buyer"
+        }
+      },
+      {
+        $project: { 'buyer.address': 1, 'buyer.phoneNumber': 1, 'buyer.userName': 1, 'buyer._id': 1, orders: 1, 'orderedItems.name': 1, 'orderedItems.imageUrl': 1, 'orderedItems._id': 1 }
       }
-    });
+      );
+    }
     switch (type) {
       case "Vendor": {
         user = await this.vendorModel.aggregate(aggregate);
@@ -356,11 +397,34 @@ export class UserService {
         break;
       }
     }
+    for (let i = 0; i < user.length; i++) {
+      for (let j = 0; j < user[i].orders.length; j++) {
+        for (let k = 0; k < user[i].orders[j].orders.items.length; k++) {
+          let id = user[i].orders[j].orders.items[k].groceries;
+          for (let l = 0; l < user[i].orderedItems.length; l++) {
+            if(id.toString() === user[i].orderedItems[l]._id.toString()) {
+              user[i].orders[j].orders.items[k].groceries = user[i].orderedItems[l];
+            }
+          }
+        }
+      }
+    }
+    for (let i = 0; i < user.length; i++) {
+      for (let j = 0; j < user[i].orders.length; j++) {
+        let id = user[i].orders[j].orders.customer;
+        for (let k = 0; k < user[i].buyer.length; k++) {
+          if(id.toString() === user[i].buyer[k]._id.toString()) {
+            user[i].orders[j].orders.customer = user[i].buyer[k];
+          }
+        }
+      }
+    }
     return user;
   }
 
   async customersOrders(id: string, type: string, orderType?: string) {
     try {
+      console.log(id, type)
       return await this.getAllOrders(id, type, orderType);
     } catch (error) {
       throw new HttpException(error, error.status);

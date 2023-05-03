@@ -1,4 +1,4 @@
-import { IsNotEmpty } from "class-validator"
+import { IsNotEmpty, IsOptional } from "class-validator"
 
 export class WareHouseDTO {
 
@@ -14,6 +14,9 @@ export class WareHouseDTO {
 
   @IsNotEmpty()
   town: string;
+
+  @IsOptional()
+  name: string;
 }
 
 export class Payment {
