@@ -1,6 +1,6 @@
-import { Controller, Get, Post, Body, HttpException, Query } from '@nestjs/common';
+import { Controller, Get, Post, Put, Body, HttpException, Query } from '@nestjs/common';
 import { UserService } from './user.service';
-import { LoginDTO, RegisterDTO, AddToCart, BuyItemsDTO, MenuDTO, GoeData } from './dto/user.dto';
+import { LoginDTO, RegisterDTO, AddToCart, BuyItemsDTO, MenuDTO, GoeData, UpdateProfileDTO } from './dto/user.dto';
 
 @Controller('user')
 export class UserController {
@@ -72,9 +72,9 @@ export class UserController {
   }
 
   @Post('addToCart')
-  async addToCart(@Query('id') id: string, @Body() cart: AddToCart) {
+  async addToCart(@Query('id') id: string, @Query('type') type: string, @Body() cart: AddToCart) {
     try {
-      return await this.userService.addToCart(cart, id);
+      return await this.userService.addToCart(cart, id, type);
     } catch (error) {
       throw new HttpException(error, error.status);
     }
@@ -111,6 +111,24 @@ export class UserController {
   async yourOrders(@Query('id') id: string, @Query('type') type: string, @Query('orderType') orderType: string) {
     try {
       return await this.userService.orders(id, type, orderType);
+    } catch (error) {
+      throw new HttpException(error, error.status);
+    }
+  }
+
+  @Put('clear/cart')
+  async clearCart(@Query('id') id: string, @Query('type') type: string) {
+    try {
+      return await this.userService.emptyCart(id, type);
+    } catch (error) {
+      throw new HttpException(error, error.status);
+    }
+  }
+
+  @Put('update/profile')
+  async updateProfile(@Query('id') id: string, @Query('type') type: string, @Body() body: UpdateProfileDTO) {
+    try {
+      return await this.userService.emptyCart(id, type);
     } catch (error) {
       throw new HttpException(error, error.status);
     }

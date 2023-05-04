@@ -54,6 +54,29 @@ export class RegisterDTO {
   type: USER_TYPE;
 }
 
+export class UpdateProfileDTO {
+  @IsOptional()
+  @IsString()
+  userName?: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @IsAlphanumeric("en-US")
+  @MinLength(8, {
+    message: 'Password Should be atleast 8 Characters and contain alphabets and numbers',
+  })
+  password: string;
+
+  @IsNumber()
+  @IsNotEmpty()
+  phoneNumber?: number;
+
+  @ValidateNested({ each: true })
+  @IsObject()
+  @Type(() => AddressDTO)
+  address: AddressDTO[];
+}
+
 export class LoginDTO {
   @IsEmail()
   @IsNotEmpty()

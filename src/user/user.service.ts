@@ -2,7 +2,7 @@ import { BadRequestException, HttpException, Injectable, NotFoundException } fro
 import { USER_NAME, UserDocument } from './schemas/user.schema';
 import mongoose, { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { AddToCart, BuyItemsDTO, GoeData, LoginDTO, MenuDTO, RegisterDTO } from './dto/user.dto';
+import { AddToCart, BuyItemsDTO, GoeData, LoginDTO, MenuDTO, RegisterDTO, UpdateProfileDTO } from './dto/user.dto';
 import { CUSTOMER_NAME, CustomerDocument } from './schemas/customer.schema';
 import { hash } from 'bcrypt';
 import { DISTRIBUTOR_NAME, DistributorDocument } from './schemas/distibutor.schema';
@@ -170,11 +170,11 @@ export class UserService {
       let user: DistributorDocument | VendorDocument | CustomerDocument;
       switch (userType) {
         case "Vendor": {
-          user = await this.vendorModel.findById(id);
+          user = await this.vendorModel.findById(id).populate(['cartItems.seller', 'cartItems.items.groceries']);
           break;
         }
         case "Distributor": {
-          user = await this.distributorModel.findById(id);
+          user = await this.distributorModel.findById(id).populate(['cartItems.seller', 'cartItems.items.groceries']);
           break;
         }
         case "Customer": {
@@ -199,9 +199,17 @@ export class UserService {
     }
   }
 
-  async addToCart(cartItem: AddToCart, id: string) {
+  async addToCart(cartItem: AddToCart, id: string, type?: string) {
     try {
-      const user = await this.customerModel.findById(id);
+      let user: any;
+      if(type === "Vendor") {
+        user = await this.vendorModel.findById(id);
+      }
+      else if(type === "Distributor") {
+        user = await this.distributorModel.findById(id);
+      }
+      else
+        user = await this.customerModel.findById(id);
       let flag = 1;
       for (let i = 0; i < user?.cartItems?.length; i++) {
         if (user.cartItems[i].seller.toString() === cartItem.seller.toString()) {
@@ -288,8 +296,19 @@ export class UserService {
 
   async buyGroceries(items: BuyItemsDTO[], buyerId: string, sellerType: string, buyerType: string, orderType: string) {
     try {
-      for (let i = 0; i < items.length; i++) {
-        await this.buyGrocery(items[i], buyerId, sellerType, buyerType, orderType);
+      if(!sellerType) {
+        console.log("Hello World---------")
+        for (let i = 0; i < items.length; i++) {
+          let user: any = await this.userModel.findById(items[i].seller);
+          let sellerType = user.userType;
+          console.log(user);
+          await this.buyGrocery(items[i], buyerId, sellerType, buyerType, orderType);
+        }
+      }
+      else {
+        for (let i = 0; i < items.length; i++) {
+          await this.buyGrocery(items[i], buyerId, sellerType, buyerType, orderType);
+        }
       }
       return {
         message: "Order Placed SuccessFully",
@@ -481,6 +500,62 @@ export class UserService {
   async orders(id: string, type: string, orderType?: string) {
     try {
       return await this.allOrders(id, type, orderType);
+    } catch (error) {
+      throw new HttpException(error, error.status);
+    }
+  }
+
+  async emptyCart(id: string, type: string) {
+    try {
+      let user: CustomerDocument | DistributorDocument | VendorDocument;
+      switch (type) {
+        case "Vendor": {
+          user = await this.vendorModel.findById(id);
+          break;
+        }
+        case "Distributor": {
+          user = await this.distributorModel.findById(id);
+          break;
+        }
+        case "Customer": {
+          user = await this.customerModel.findById(id);
+          break;
+        }
+      };
+      user.cartItems = [];
+      await user.save();
+      return {
+        success: true,
+      }
+    } catch (error) {
+      throw new HttpException(error, error.status);
+    }
+  }
+
+  async updateProfile(id: string, type: string, body: UpdateProfileDTO) {
+    try {
+      let user: CustomerDocument | DistributorDocument | VendorDocument | FarmerDocument;
+      switch (type) {
+        case "Vendor": {
+          user = await this.vendorModel.findByIdAndUpdate(id, body);
+          break;
+        }
+        case "Distributor": {
+          user = await this.distributorModel.findByIdAndUpdate(id, body);
+          break;
+        }
+        case "Customer": {
+          user = await this.farmerModel.findByIdAndUpdate(id, body);
+          break;
+        }
+        case "Farmer": {
+          user = await this.farmerModel.findByIdAndUpdate(id, body);
+          break;
+        }
+      };
+      return {
+        success: true,
+      }
     } catch (error) {
       throw new HttpException(error, error.status);
     }

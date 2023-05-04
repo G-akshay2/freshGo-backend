@@ -62,6 +62,9 @@ export class Distributor extends User {
     seller: Types.ObjectId,
     items: Array<{ groceries: Types.ObjectId | String, quantity: number }>,
   }>;
+
+  @Prop({ type: String })
+  storeName?: string;
 }
 
 export type DistributorDocument = Distributor & Document;

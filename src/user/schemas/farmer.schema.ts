@@ -36,6 +36,9 @@ export class Farmer extends User {
     customer: Types.ObjectId,
     items: Array<{ groceries: Types.ObjectId | String, quantity: number }>,
   }>;
+
+  @Prop({ type: String })
+  storeName?: string;
 }
 
 export type FarmerDocument = Farmer & Document;
